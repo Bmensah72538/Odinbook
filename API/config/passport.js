@@ -13,6 +13,7 @@ opts.issuer = 'accounts.examplesoft.com';
 opts.audience = 'yoursite.net';
 
 const strategy = new JwtStrategy(opts, function(jwt_payload, done) {
+    console.log('payload',jwt_payload);
   User.findOne({id: jwt_payload.sub}, function(err, user) {
       if (err) {
           return done(err, false);

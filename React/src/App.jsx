@@ -1,18 +1,18 @@
 import { useState } from 'react'
 import './App.css'
 import Home from './components/home'
-import Login from './components/login'
+import Footer from './components/footer';
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const [loggedIn, setLoggedIn] = useState('false');
+  
+  console.log(loggedIn);
   return (
     <>
     <div className='main'>
-      <Home />
-      <br />
-      <Login />
-
+      <Home loggedIn={loggedIn}
+        setLoggedIn={setLoggedIn}  />
+      <Footer />
     </div>
     </>
   )

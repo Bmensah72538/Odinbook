@@ -23,9 +23,9 @@ router.post('/login', (req, res) => {
         const refresh = utils.issueRefresh(user);
         res.json({
             access: access,
-            refresh: refresh
+            refresh: refresh,
+            userId: user._id
         });
-
     })
     
 })
@@ -63,7 +63,6 @@ router.get('/refresh', (req, res) => {
 // })
 
 router.post('/messages', async(req, res) => {
-    
     const user = await User.findById('658f469b4736ad5b996dc5b8')
     const chatroomid = '10';
     const message = req.body.message;
@@ -72,7 +71,7 @@ router.post('/messages', async(req, res) => {
     chatroom.participants.push(user._id);
     await chatroom.save()
     
-    console.log(chatroom)
+    // console.log('messagepost', chatroom)
     
     res.send('yea')
 
@@ -84,9 +83,12 @@ router.get('/messages', utils.authJWT, async(req, res) => {
     const userId = req.user.sub;
     const user = await User.findById(userId);
     const chatrooms = await Chatrooms.find({ participants: userId })
-    console.log(chatrooms)
     
-    res.send('heehee')
+    
+    res.json({
+        user: user,
+        chatrooms: chatrooms
+    })
 
 })
 

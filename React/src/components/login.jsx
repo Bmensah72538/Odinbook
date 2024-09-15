@@ -1,7 +1,7 @@
 import client from '../axios/client.js'
 import { useState } from 'react'
 
-function Login(){
+function Login({loggedIn, setLoggedIn}){
     const [ credentials, setCredentials ] = useState({
         username: '',
         password: ''
@@ -23,13 +23,17 @@ function Login(){
                 username: username,
                 password: password
             })
-            console.log(response)
+            if(response.data == "invalid username/password") {
+                alert("Invalid username/password");
+                return; 
+            }
             const accessToken = response.data.access.token.split(' ')[1];
             const refreshToken = response.data.refresh.token.split(' ')[1];
-
+            const userId = response.data.userId;
             localStorage.setItem('accessToken', accessToken);
-            localStorage.setItem('refreshToken', refreshToken)
-
+            localStorage.setItem('refreshToken', refreshToken);
+            localStorage.setItem('userId', userId);
+            setLoggedIn('true');
         } catch (error){
             console.log(error)
         }
@@ -37,24 +41,20 @@ function Login(){
     const testJWT = async function(e) {
         const response = await client.get('/api/messages')
         console.log(response);
+        console.log(`Loggedin = ${loggedIn}`)
     }
-    
+
     return (
         <>
         <div className="login">
             <form onSubmit={handleSubmit} action="" method="post">
-                <label htmlFor="username">
-                    Username:
-                </label>
-                <input type="text" name="username" id="username" required />
-                <label htmlFor="password">
-                    Password:
-                </label>
-                <input type="password" name="password" id="password" required />
-                <button type="submit">Submit</button>
+                <div className='login-form'>
+                    <input type="text" name="username" id="username" placeholder='Username' required />
+                    <input type="password" name="password" id="password" placeholder='Password' required />
+                    <button type="submit">Submit</button>
+                </div>
             </form>
-
-            <button onClick={testJWT}>Click</button>
+            <p>Logged in: {loggedIn}</p>
         </div>
         </>
     )

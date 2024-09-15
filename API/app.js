@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
-
+console.log(process.env);
 mongoose.connect(process.env.dbURI)
     .then(() => {
         console.log('Connected to mongo')
