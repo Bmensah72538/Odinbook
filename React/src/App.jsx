@@ -3,6 +3,7 @@ import './App.css';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from './components/Home';
 import Footer from './components/Footer';
+import Signup from './components/Signup';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState('false');
@@ -30,6 +31,18 @@ function App() {
           {/* <Header /> */}
           <main>
           <div>Profile Page</div>
+          </main>
+          <Footer />
+        </>
+      ),
+    },
+    {
+      path: "/signup",
+      element: (
+        <>
+          {/* <Header /> */}
+          <main>
+          <Signup />
           </main>
           <Footer />
         </>
