@@ -1,4 +1,4 @@
-import client from '../tools/client.js'
+import client from '../tools/axiosClient'
 import { useState } from 'react'
 
 function Signup({loggedIn, setLoggedIn}){

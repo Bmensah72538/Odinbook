@@ -1,4 +1,4 @@
-import client from '../tools/client.js'
+import client from '../tools/axiosClient.js';
 import Login from './Login.jsx';
 import hankkiLogo from '../assets/logos/Hankki_logo.png';
 import styles from './Home.module.css'
