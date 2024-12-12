@@ -1,4 +1,4 @@
-import client from '../axios/client.js'
+import client from '../tools/client.js'
 import Login from './Login.jsx';
 import hankkiLogo from '../assets/logos/Hankki_logo.png';
 import styles from './Home.module.css'
@@ -17,7 +17,7 @@ function Home({loggedIn, setLoggedIn}) {
                     <div id="logo-container">
                         <img id="logo" src={hankkiLogo} alt="Hankki_logo"></img>
                     </div>
-                    <p>This is totally not a facebook rip off.</p>
+                    <p>This is a work in progress!</p>
                 </div>
                 <div id='landing-right' className='landing-halve'>
                     <Login 

@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+#Enviroment Variables
+.env
+.env.development
+.env.production
+
+#Misc
+
+ChatGPT.txt
