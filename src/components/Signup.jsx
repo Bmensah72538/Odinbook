@@ -1,63 +1,81 @@
-import client from '../tools/axiosClient'
-import { useState } from 'react'
+import client from '../tools/axiosClient';
+import { useState } from 'react';
 
-function Signup({loggedIn, setLoggedIn}){
-    const [ credentials, setCredentials ] = useState({
-        username: '',
-        password: ''
-    })
+function Signup({ loggedIn, setLoggedIn }) {
+    const [credentials, setCredentials] = useState({ username: '', password: '' });
+    const [error, setError] = useState(null);
 
-    const handleSubmit = async function(e){
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setCredentials((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const username = e.target['0'].value;
-        const password = e.target['1'].value;
+        setError(null);
 
-        setCredentials({
-            username: username,
-            password: password
-        })
-
-        console.log(`Username: ${username} Password: ${password}`)
         try {
-            const response = await client.post('/api/login', {
-                username: username,
-                password: password
-            })
-            if(response.data == "invalid username/password") {
-                alert("Invalid username/password");
-                return; 
+            // Send signup request
+            const response = await client.post('/api/signup', credentials);
+
+            // Handle errors returned from the server
+            if (response.data?.error) {
+                setError(response.data.error);
+                return;
             }
+
+            // Extract tokens and user info from the response
             const accessToken = response.data.access.token.split(' ')[1];
             const refreshToken = response.data.refresh.token.split(' ')[1];
             const userId = response.data.userId;
+
+            // Store tokens in localStorage
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
             localStorage.setItem('userId', userId);
-            setLoggedIn('true');
-        } catch (error){
-            console.log(error)
+
+            // Update logged-in status
+            setLoggedIn(true);
+        } catch (err) {
+            // Handle network or unexpected errors
+            if (err.response?.data?.error) {
+                setError(err.response.data.error);
+            } else {
+                setError('An unexpected error occurred. Please try again.');
+            }
+            console.error('Signup error:', err);
         }
-    }
-    const testJWT = async function(e) {
-        const response = await client.get('/api/messages')
-        console.log(response);
-        console.log(`Loggedin = ${loggedIn}`)
-    }
+    };
 
     return (
-        <>
-        <div className="login">
-            <form onSubmit={handleSubmit} action="" method="post">
-                <div className='login-form'>
-                    <input type="text" name="username" id="username" placeholder='Username' required />
-                    <input type="password" name="password" id="password" placeholder='Password' required />
-                    <button className="login-button" type="submit">Submit</button>
+        <div className="signup">
+            <form onSubmit={handleSubmit}>
+                <div className="signup-form">
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Username"
+                        value={credentials.username}
+                        onChange={handleChange}
+                        required
+                    />
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        value={credentials.password}
+                        onChange={handleChange}
+                        required
+                    />
+                    <button className="signup-button" type="submit">
+                        Sign Up
+                    </button>
                 </div>
             </form>
-            <p>Logged in: {loggedIn}</p>
+            {error && <p className="error">{error}</p>}
+            <p>Logged in: {String(loggedIn)}</p>
         </div>
-        </>
-    )
+    );
 }
 
 export default Signup;
