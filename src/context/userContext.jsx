@@ -18,15 +18,15 @@ export const UserProvider = ({ children }) => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
-                if (!token) {
-                    setLoading(false);
+                const accessToken = localStorage.getItem('accessToken'); // Retrieve accessToken from localStorage
+                if (!accessToken) {
+                    setLoading(false); // No token, stop loading
                     return;
                 }
 
                 // Make an API request to validate the token and fetch user info
                 const response = await axios.get('/api/user', {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${accessToken}` }
                 });
 
                 setUser(response.data); // Store user data
@@ -39,16 +39,30 @@ export const UserProvider = ({ children }) => {
         };
 
         fetchUser(); // Call the fetchUser function when the component mounts
-    }, []); // Empty dependency array ensures this effect runs only once when the component mounts
+    }, []); // Empty dependency array ensures this effect runs only once
 
-    const login = (userData) => {
-        setUser(userData);
-        localStorage.setItem('token', userData.token); // Save token in localStorage
+    const login = (accessToken, refreshToken, userId) => {
+        setUser({
+          loggedIn: true,
+          accessToken,
+          refreshToken,
+          userId,
+        });
+        localStorage.setItem('accessToken', accessToken); // Store tokens in localStorage
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('userId', userId);
     };
 
     const logout = () => {
-        setUser(null);
-        localStorage.removeItem('token'); // Remove token from localStorage
+        setUser({
+          loggedIn: false,
+          accessToken: null,
+          refreshToken: null,
+          userId: null,
+        });
+        localStorage.removeItem('accessToken'); // Remove tokens from localStorage
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('userId');
     };
 
     return (

@@ -1,13 +1,12 @@
+import { useState } from 'react';
 import client from '../tools/axiosClient.js';
 import Login from './Login.jsx';
+import Signup from './Signup.jsx';
 import hankkiLogo from '../assets/logos/Hankki_logo.png';
 import styles from './Home.module.css'
 
 function Home({loggedIn, setLoggedIn}) {
-    // client.get()
-    // .then((s) => {
-    //     console.log(s);
-    // })
+    const [showLogin, setShowLogin] = useState('false');
     
     return (
         <>
@@ -20,10 +19,8 @@ function Home({loggedIn, setLoggedIn}) {
                     <p>This is a work in progress!</p>
                 </div>
                 <div id='landing-right' className='landing-halve'>
-                    <Login 
-                        loggedIn={loggedIn}
-                        setLoggedIn={setLoggedIn}  
-                    />
+                    {showLogin ? ( <Login toggleForm={() => setShowLogin(false)} />) 
+                    : ( <Signup toggleForm={() => setShowLogin(true)} />)}
                 </div>
             </div>
         </div>

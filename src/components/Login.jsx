@@ -1,11 +1,13 @@
 import client from '../tools/axiosClient';
 import { useState } from 'react';
 import styles from './Login.module.css';
+import { useNavigate } from 'react-router-dom';
 
-function Login({ loggedIn, setLoggedIn }) {
+
+function Login({ loggedIn, setLoggedIn, toggleForm }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
         const { username, password } = Object.fromEntries(new FormData(e.target));
@@ -61,6 +63,9 @@ function Login({ loggedIn, setLoggedIn }) {
                 {error && <p className={styles.error}>{error}</p>}
                 {loggedIn && <p className={styles.success}>You are logged in!</p>}
             </form>
+            <p>
+            Don't have an account?{' '} <button onClick={() => {navigate('/signup')}}>Sign up here</button>
+            </p>
         </div>
     );
 }
