@@ -2,63 +2,67 @@ import client from '../tools/axiosClient';
 import { useState } from 'react';
 import styles from './Login.module.css';
 
-function Login({loggedIn, setLoggedIn}){
-    const [ credentials, setCredentials ] = useState({
-        username: '',
-        password: ''
-    })
+function Login({ loggedIn, setLoggedIn }) {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    const handleSubmit = async function(e){
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const username = e.target['0'].value;
-        const password = e.target['1'].value;
+        const { username, password } = Object.fromEntries(new FormData(e.target));
 
-        setCredentials({
-            username: username,
-            password: password
-        })
+        setLoading(true);
+        setError(null); // Reset error state
 
-        console.log(`Username: ${username} Password: ${password}`)
         try {
-            const response = await client.post('/api/login', {
-                username: username,
-                password: password
-            })
-            if(response.data == "invalid username/password") {
-                alert("Invalid username/password");
-                return; 
+            const response = await client.post('/api/login', { username, password });
+
+            if (response.data?.error) {
+                setError(response.data.error);
+                return;
             }
-            const accessToken = response.data.access.token.split(' ')[1];
-            const refreshToken = response.data.refresh.token.split(' ')[1];
-            const userId = response.data.userId;
-            localStorage.setItem('accessToken', accessToken);
-            localStorage.setItem('refreshToken', refreshToken);
+
+            const { access, refresh, userId } = response.data;
+            localStorage.setItem('accessToken', access.token.split(' ')[1] || access.token);
+            localStorage.setItem('refreshToken', refresh.token.split(' ')[1] || refresh.token);
             localStorage.setItem('userId', userId);
-            setLoggedIn('true');
-        } catch (error){
-            console.log(error)
+            setLoggedIn(true);
+        } catch (error) {
+            console.error('Login failed:', error);
+            setError('An unexpected error occurred. Please try again.');
+        } finally {
+            setLoading(false);
         }
-    }
-    const testJWT = async function(e) {
-        const response = await client.get('/api/messages')
-        console.log(response);
-        console.log(`Loggedin = ${loggedIn}`)
-    }
+    };
 
     return (
-        <>
         <div className={styles.container}>
-            <form onSubmit={handleSubmit} action="" method="post">
+            <form onSubmit={handleSubmit}>
                 <div className={styles['login-form']}>
-                    <input type="text" name="username" id="username" placeholder='Username' required />
-                    <input type="password" name="password" id="password" placeholder='Password' required />
-                    <button className="login-button" type="submit">Submit</button>
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Username"
+                        required
+                    />
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        required
+                    />
+                    <button
+                        type="submit"
+                        className={styles['login-button']}
+                        disabled={loading}
+                    >
+                        {loading ? 'Logging in...' : 'Submit'}
+                    </button>
                 </div>
+                {error && <p className={styles.error}>{error}</p>}
+                {loggedIn && <p className={styles.success}>You are logged in!</p>}
             </form>
-            <p>Logged in: {loggedIn}</p>
         </div>
-        </>
-    )
+    );
 }
 
 export default Login;
