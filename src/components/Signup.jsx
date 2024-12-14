@@ -1,19 +1,17 @@
-import client from '../tools/axiosClient';
 import { useState } from 'react';
+import client from '../tools/axiosClient';
 import styles from './Signup.module.css';
-import ReCAPTCHA from 'react-google-recaptcha';
 import { useNavigate } from 'react-router-dom';
+import useRecaptcha from '../tools/recaptcha';  // Import the custom hook
 
-function Signup({ loggedIn, setLoggedIn}) {
+function Signup({ loggedIn, setLoggedIn }) {
     const [credentials, setCredentials] = useState({ username: '', password: '', email: '' });
-    const [confirmPassword, setConfirmPassword] = useState('');  // Separate state for password confirmation
+    const [confirmPassword, setConfirmPassword] = useState(''); // Separate state for password confirmation
     const [error, setError] = useState(null);
-    const [captchaToken, setCaptchaToken] = useState(null);
-
     const navigate = useNavigate();
-    const handleCaptchaChange = (token) => {
-        setCaptchaToken(token);  // Store the token when CAPTCHA changes
-    };
+
+    // Use the custom reCAPTCHA hook
+    const { captchaToken, executeCaptcha, loaded } = useRecaptcha(import.meta.env.VITE_RECAPTCHAKEY);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -21,7 +19,7 @@ function Signup({ loggedIn, setLoggedIn}) {
     };
 
     const handleConfirmPasswordChange = (e) => {
-        setConfirmPassword(e.target.value);  // Update the confirm password state
+        setConfirmPassword(e.target.value); // Update the confirm password state
     };
 
     const handleSubmit = async (e) => {
@@ -37,7 +35,7 @@ function Signup({ loggedIn, setLoggedIn}) {
             return;
         }
 
-        setError(null);  // Reset error state
+        setError(null); // Reset error state
 
         try {
             // Send signup request with credentials and captchaToken
@@ -73,7 +71,7 @@ function Signup({ loggedIn, setLoggedIn}) {
     return (
         <div className={styles.container}>
             <form onSubmit={handleSubmit}>
-                <div className={styles['login-form']}>
+                <div className={styles['signup-form']}>
                     <input
                         type="text"
                         name="username"
@@ -106,18 +104,21 @@ function Signup({ loggedIn, setLoggedIn}) {
                         onChange={handleChange}
                         required
                     />
-                    <ReCAPTCHA
-                        sitekey={import.meta.env.VITE_RECAPTCHAKEY}
-                        onChange={handleCaptchaChange}
-                    />
-                    <button className={styles['login-button']} type="submit" disabled={!captchaToken}>
+
+                    {/* Trigger reCAPTCHA manually on form submit */}
+                    <button
+                        className={styles['login-button']}
+                        type="submit"
+                        disabled={!loaded}
+                        onClick={executeCaptcha}  // Trigger CAPTCHA verification when clicking submit
+                    >
                         Sign Up
                     </button>
                 </div>
             </form>
             {error && <p className="error">{error}</p>}
             <p>
-                Have an account? <button onClick={() => {navigate('/')}}>Login here</button>
+                Have an account? <button onClick={() => { navigate('/'); }}>Login here</button>
             </p>
         </div>
     );
