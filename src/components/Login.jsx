@@ -61,7 +61,7 @@ function Login({}) {
                     </button>
                 </div>
                 {error && <p className={styles.error}>{error}</p>}
-                {loggedIn && <p className={styles.success}>You are logged in!</p>}
+                {user && <p className={styles.success}>You are logged in!</p>}
             </form>
             <p>
             Don't have an account?{' '} <button onClick={() => {navigate('/signup')}}>Sign up here</button>
