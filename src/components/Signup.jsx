@@ -2,16 +2,14 @@ import { useState } from 'react';
 import client from '../tools/axiosClient';
 import styles from './Signup.module.css';
 import { useNavigate } from 'react-router-dom';
-import useRecaptcha from '../tools/recaptcha';  // Import the custom hook
+import { useUserContext } from '../context/userContext';
 
-function Signup({ loggedIn, setLoggedIn }) {
+function Signup() {
     const [credentials, setCredentials] = useState({ username: '', password: '', email: '' });
     const [confirmPassword, setConfirmPassword] = useState(''); // Separate state for password confirmation
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-
-    // Use the custom reCAPTCHA hook
-    const { captchaToken, executeCaptcha, loaded } = useRecaptcha(import.meta.env.VITE_RECAPTCHAKEY);
+    const { user, login, logout} = useUserContext();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -19,16 +17,11 @@ function Signup({ loggedIn, setLoggedIn }) {
     };
 
     const handleConfirmPasswordChange = (e) => {
-        setConfirmPassword(e.target.value); // Update the confirm password state
+        setConfirmPassword(e.target.value); 
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!captchaToken) {
-            alert('Please complete the CAPTCHA.');
-            return;
-        }
 
         if (credentials.password !== confirmPassword) {
             setError('Passwords do not match');
@@ -38,15 +31,8 @@ function Signup({ loggedIn, setLoggedIn }) {
         setError(null); // Reset error state
 
         try {
-            // Trigger CAPTCHA validation before sending the request
-            if (loaded) {
-                await executeCaptcha();  // Execute reCAPTCHA here
-            }
-
-            // Send signup request with credentials and captchaToken
             const response = await client.post('/api/signup', {
                 ...credentials,
-                captchaToken, // Pass the token to the backend
             });
 
             if (response.data?.error) {
@@ -58,14 +44,10 @@ function Signup({ loggedIn, setLoggedIn }) {
             const refreshToken = response.data.refresh.token.split(' ')[1];
             const userId = response.data.userId;
 
-            // Store tokens in localStorage
-            localStorage.setItem('accessToken', accessToken);
-            localStorage.setItem('refreshToken', refreshToken);
-            localStorage.setItem('userId', userId);
-
-            // Update logged-in status
-            setLoggedIn(true);
-            navigate('/dashboard'); // Redirect after successful signup
+            // Login user
+            await login(accessToken, refreshToken, userId);
+            // Navigate user to dashboard
+            await navigate('/dashboard');
         } catch (err) {
             // Handle network or unexpected errors
             setError(err.response?.data?.error || 'An unexpected error occurred. Please try again.');
@@ -109,12 +91,9 @@ function Signup({ loggedIn, setLoggedIn }) {
                         onChange={handleChange}
                         required
                     />
-
-                    {/* Trigger reCAPTCHA manually on form submit */}
                     <button
                         className={styles['login-button']}
                         type="submit"
-                        disabled={!loaded || !captchaToken}  // Disable if CAPTCHA is not loaded or token is not available
                     >
                         Sign Up
                     </button>
