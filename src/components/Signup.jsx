@@ -38,11 +38,15 @@ function Signup({ loggedIn, setLoggedIn }) {
         setError(null); // Reset error state
 
         try {
+            // Trigger CAPTCHA validation before sending the request
+            if (loaded) {
+                await executeCaptcha();  // Execute reCAPTCHA here
+            }
+
             // Send signup request with credentials and captchaToken
             const response = await client.post('/api/signup', {
                 ...credentials,
-                confirmPassword,  // Include confirmPassword if needed on backend
-                captchaToken,
+                captchaToken, // Pass the token to the backend
             });
 
             if (response.data?.error) {
@@ -61,6 +65,7 @@ function Signup({ loggedIn, setLoggedIn }) {
 
             // Update logged-in status
             setLoggedIn(true);
+            navigate('/dashboard'); // Redirect after successful signup
         } catch (err) {
             // Handle network or unexpected errors
             setError(err.response?.data?.error || 'An unexpected error occurred. Please try again.');
@@ -109,8 +114,7 @@ function Signup({ loggedIn, setLoggedIn }) {
                     <button
                         className={styles['login-button']}
                         type="submit"
-                        disabled={!loaded}
-                        onClick={executeCaptcha}  // Trigger CAPTCHA verification when clicking submit
+                        disabled={!loaded || !captchaToken}  // Disable if CAPTCHA is not loaded or token is not available
                     >
                         Sign Up
                     </button>

@@ -8,6 +8,14 @@ import Signup from './components/Signup';
 function App() {
   const [loggedIn, setLoggedIn] = useState('false');
   
+  // Check if the user is logged in when the app mounts
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      setLoggedIn(true); // If token exists, user is logged in
+    }
+  }, []);
+
   console.log(loggedIn);
   const router = createBrowserRouter([
     {
@@ -16,21 +24,19 @@ function App() {
         <>
           {/* <Header /> */}
           <main>
-            <Home loggedIn={loggedIn}
-            setLoggedIn={setLoggedIn}  
-            />
+            <Home />
           </main>
           <Footer />
         </>
       ),
     },
     {
-      path: "/profile",
+      path: "/dashboard",
       element: (
         <>
           {/* <Header /> */}
           <main>
-          <div>Profile Page</div>
+          <div>Dashboard! Yes, that's all that's here.</div>
           </main>
           <Footer />
         </>

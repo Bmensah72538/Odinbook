@@ -1,12 +1,15 @@
 import client from '../tools/axiosClient';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import styles from './Login.module.css';
 import { useNavigate } from 'react-router-dom';
+import { useUserContext } from '../context/userContext';
 
 
-function Login({ loggedIn, setLoggedIn, toggleForm }) {
+function Login({}) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const { user, login, logout } = useUserContext();
+
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,10 +27,7 @@ function Login({ loggedIn, setLoggedIn, toggleForm }) {
             }
 
             const { access, refresh, userId } = response.data;
-            localStorage.setItem('accessToken', access.token.split(' ')[1] || access.token);
-            localStorage.setItem('refreshToken', refresh.token.split(' ')[1] || refresh.token);
-            localStorage.setItem('userId', userId);
-            setLoggedIn(true);
+            login(access, refresh, userId);
         } catch (error) {
             console.error('Login failed:', error);
             setError('An unexpected error occurred. Please try again.');
