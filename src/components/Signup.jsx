@@ -8,6 +8,7 @@ function Signup() {
     const [credentials, setCredentials] = useState({ username: '', password: '', email: '' });
     const [confirmPassword, setConfirmPassword] = useState(''); // Separate state for password confirmation
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { user, login, logout} = useUserContext();
 
@@ -21,10 +22,12 @@ function Signup() {
     };
 
     const handleSubmit = async (e) => {
+        
         e.preventDefault();
-
+        setLoading(true); // Set loading state
         if (credentials.password !== confirmPassword) {
             setError('Passwords do not match');
+            setLoading(false);
             return;
         }
 
@@ -37,6 +40,7 @@ function Signup() {
 
             if (response.data?.error) {
                 setError(response.data.error);
+                setLoading(false);
                 return;
             }
 
@@ -51,8 +55,10 @@ function Signup() {
         } catch (err) {
             // Handle network or unexpected errors
             setError(err.response?.data?.error || 'An unexpected error occurred. Please try again.');
+            setLoading(false);
             console.error('Signup error:', err);
         }
+        setLoading(false);
     };
 
     return (
@@ -100,6 +106,7 @@ function Signup() {
                 </div>
             </form>
             {error && <p className="error">{error}</p>}
+            {loading && <p className="loading">Loading...</p>}
             <p>
                 Have an account? <button onClick={() => { navigate('/'); }}>Login here</button>
             </p>
