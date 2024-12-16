@@ -101,12 +101,11 @@ function Signup() {
                         className={styles['login-button']}
                         type="submit"
                     >
-                        Sign Up
+                        {loading ? ('Signing up...') : ('Sign Up')}
                     </button>
                 </div>
             </form>
             {error && <p className="error">{error}</p>}
-            {loading && <p className="loading">Loading...</p>}
             <p>
                 Have an account? <button onClick={() => { navigate('/'); }}>Login here</button>
             </p>

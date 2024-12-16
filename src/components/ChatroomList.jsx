@@ -1,22 +1,16 @@
 // src/components/ChatroomList.js
 
 import { useEffect } from 'react';
-import { useChatContext } from '../context/ChatContext';
-import { joinChatroom } from '../services/socketService';
+import { useChatContext } from '../context/chatContext';
+import socketService from '../services/socketService';
 
 const ChatroomList = () => {
     const { chatrooms, setCurrentChatroom } = useChatContext();
 
     const handleSelectChatroom = (chatroomId) => {
         setCurrentChatroom(chatroomId);
-        joinChatroom(chatroomId);
+        socketService.joinChatroom(chatroomId);
     };
-
-    useEffect(() => {
-        if (chatrooms.length > 0) {
-            setCurrentChatroom(chatrooms[0].id);
-        }
-    }, [chatrooms]);
 
     return (
         <div>

@@ -1,8 +1,8 @@
 // src/components/Chatroom.js
 
 import { useState, useEffect } from 'react';
-import { useChatContext } from '../context/ChatContext';
-import { sendMessage, getMessages, onNewMessage } from '../services/socketService';
+import { useChatContext } from '../context/chatContext';
+import socketService from '../services/socketService';
 
 const Chatroom = () => {
     const { currentChatroom } = useChatContext();
@@ -22,7 +22,7 @@ const Chatroom = () => {
     }, [currentChatroom]);
 
     const handleSendMessage = () => {
-        sendMessage(currentChatroom, newMessage);
+        socketService.sendMessage(currentChatroom, newMessage);
         setNewMessage('');
     };
 

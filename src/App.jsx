@@ -4,6 +4,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from './components/Home';
 import Footer from './components/Footer';
 import Signup from './components/Signup';
+import { ChatProvider } from './context/chatContext';
+import Chat from './components/Chat';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState('false');
@@ -49,6 +51,20 @@ function App() {
           {/* <Header /> */}
           <main>
           <Signup />
+          </main>
+          <Footer />
+        </>
+      ),
+    },
+    {
+      path: "/chat",
+      element: (
+        <>
+          {/* <Header /> */}
+          <main>
+            <ChatProvider>
+              <Chat />
+            </ChatProvider>
           </main>
           <Footer />
         </>

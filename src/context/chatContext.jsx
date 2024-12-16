@@ -1,6 +1,6 @@
-// src/context/ChatContext.js
+// src/context/chatContext.js
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useUserContext } from './UserContext'; // Import the UserContext
+import { useUserContext } from './userContext'; // Import the UserContext
 import axios from 'axios';
 
 const ChatContext = createContext();

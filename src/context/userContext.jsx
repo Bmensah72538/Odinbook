@@ -1,4 +1,4 @@
-// src/context/UserContext.js
+// src/context/userContext.js
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 

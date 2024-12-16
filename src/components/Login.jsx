@@ -57,7 +57,7 @@ function Login({}) {
                         className={styles['login-button']}
                         disabled={loading}
                     >
-                        {loading ? 'Logging in...' : 'Submit'}
+                        {loading ? 'Logging in...' : 'Log in'}
                     </button>
                 </div>
                 {error && <p className={styles.error}>{error}</p>}
