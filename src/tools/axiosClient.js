@@ -1,69 +1,72 @@
-import axios from "axios";
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const client = axios.create({
-    baseURL: apiUrl,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  baseURL: apiUrl,
+  headers: { 'Content-Type': 'application/json' },
+});
 
-// Refresh token function
-const refreshAccessToken = async () => {
+const isTokenExpired = (token) => {
   try {
-      const refreshToken = localStorage.getItem('refreshToken');
-      const response = await apiClient.post('/refresh', { refreshToken });
-
-      const { accessToken } = response.data;
-      localStorage.setItem('accessToken', accessToken);
-      return accessToken;
-  } catch (error) {
-      console.error('Failed to refresh token:', error);
-      throw error;
+    const { exp } = jwtDecode(token);
+    return Date.now() >= exp * 1000;
+  } catch {
+    return true;
   }
 };
 
-// Axios request interceptor
+const refreshAccessToken = async () => {
+  const refreshToken = localStorage.getItem('refreshToken');
+  if (!refreshToken) {
+    console.error('No refresh token available');
+    throw new Error('No refresh token available');
+  }
+
+  try {
+    const response = await client.post('/refresh', { refreshToken });
+    const { accessToken } = response.data;
+    localStorage.setItem('accessToken', accessToken);
+    return accessToken;
+  } catch (error) {
+    console.error('Failed to refresh token:', error);
+    throw error;
+  }
+};
+
 client.interceptors.request.use(
-  function(config) {
+  (request) => {
     const accessToken = localStorage.getItem('accessToken');
-    const refreshToken = localStorage.getItem('refreshToken')
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+
+    if (accessToken && !isTokenExpired(accessToken)) {
+      request.headers.Authorization = `Bearer ${accessToken}`;
     }
-    return config;
+    return request;
   },
-  function(error) {
-    Promise.reject(error)
-  }
+  (error) => Promise.reject(error)
 );
 
-
-// Axios response interceptor
 client.interceptors.response.use(
-  (response) => response, // Pass through successful responses
+  (response) => response,
   async (error) => {
-      const originalRequest = error.config;
+    const originalRequest = error.config;
 
-      // If unauthorized (401) and no retry flag set
-      if (error.response?.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true; // Prevent infinite loops
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
 
-          try {
-              const newAccessToken = await refreshAccessToken();
-              originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-              return client(originalRequest); // Retry with new token
-          } catch (refreshError) {
-              console.error('Refresh token expired or invalid:', refreshError);
-              // Optional: Redirect to login or show logout modal
-              return Promise.reject(refreshError);
-          }
+      try {
+        const newAccessToken = await refreshAccessToken();
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return client(originalRequest);
+      } catch (refreshError) {
+        console.error('Refresh token expired or invalid:', refreshError);
+        return Promise.reject(refreshError);
       }
+    }
 
-      return Promise.reject(error); // Propagate other errors
+    return Promise.reject(error);
   }
 );
-
 
 export default client;

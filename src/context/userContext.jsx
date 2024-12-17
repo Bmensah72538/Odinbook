@@ -1,10 +1,10 @@
 // src/context/userContext.js
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // Create UserContext
 const UserContext = createContext();
-
 // Custom hook to use the UserContext
 export const useUserContext = () => useContext(UserContext);
 
@@ -13,7 +13,6 @@ export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null); // Store user data
     const [loading, setLoading] = useState(true); // Track loading state
     const [error, setError] = useState(null); // Store error if authentication fails
-
     // Use effect to fetch user data or validate the JWT token
     useEffect(() => {
         const fetchUser = async () => {
@@ -53,7 +52,7 @@ export const UserProvider = ({ children }) => {
         localStorage.setItem('userId', userId);
     };
 
-    const logout = () => {
+    const logout = async () => {
         setUser({
           loggedIn: false,
           accessToken: null,

@@ -1,44 +1,55 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Home from './components/Home';
-import Footer from './components/Footer';
-import Signup from './components/Signup';
+
+// Contexts
+import { LoadingProvider } from './context/loadingContext'; 
+import { useUserContext } from './context/userContext';
 import { ChatProvider } from './context/chatContext';
+
+// UI Components
+import LoadingScreen from './components/LoadingScreen';
+import Home from './components/Home';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import LandingPage from './components/LandingPage';
+import Signup from './components/Signup';
 import Chat from './components/Chat';
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState('false');
-  
   // Check if the user is logged in when the app mounts
-  useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      setLoggedIn(true); // If token exists, user is logged in
-    }
-  }, []);
+  const { user } = useUserContext();
 
-  console.log(loggedIn);
   const router = createBrowserRouter([
     {
       path: "/",
-      element: (
-        <>
-          {/* <Header /> */}
+      element:  user ? (
+          <>
+          <LoadingScreen/>
+          <Header/>
           <main>
             <Home />
           </main>
           <Footer />
         </>
-      ),
+        ) : (
+          <>
+          <LoadingScreen/>
+          <main>
+            <LandingPage />
+          </main>
+          <Footer />
+        </>
+        ),
     },
     {
-      path: "/dashboard",
+      path: "/login",
       element: (
         <>
           {/* <Header /> */}
+          <LoadingScreen/>
           <main>
-          <div>Dashboard! Yes, that's all that's here.</div>
+          <Signup />
           </main>
           <Footer />
         </>
@@ -49,8 +60,22 @@ function App() {
       element: (
         <>
           {/* <Header /> */}
+          <LoadingScreen/>
           <main>
           <Signup />
+          </main>
+          <Footer />
+        </>
+      ),
+    },
+    {
+      path: "/dashboard",
+      element: (
+        <>
+          {/* <Header /> */}
+          <LoadingScreen/>
+          <main>
+          <div>Dashboard! Yes, that's all that's here.</div>
           </main>
           <Footer />
         </>
@@ -61,6 +86,7 @@ function App() {
       element: (
         <>
           {/* <Header /> */}
+          <LoadingScreen/>
           <main>
             <ChatProvider>
               <Chat />
@@ -73,7 +99,9 @@ function App() {
   ]);
   return (
     <>    
-    <RouterProvider router={router} />
+    <LoadingProvider>
+      <RouterProvider router={router} />
+    </LoadingProvider>
     </>
   )
 }
