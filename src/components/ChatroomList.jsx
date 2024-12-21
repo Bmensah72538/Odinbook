@@ -2,10 +2,31 @@
 
 import { useEffect } from 'react';
 import { useChatContext } from '../context/chatContext';
+import { useUserContext } from '../context/userContext';
+import client from '../tools/axiosClient';
 import socketService from '../services/socketService';
+import styles from './ChatroomList.module.css'
 
 const ChatroomList = () => {
-    const { chatrooms, setCurrentChatroom } = useChatContext();
+    const { chatrooms, setChatrooms, setCurrentChatroom } = useChatContext();
+    const { user } = useUserContext();
+
+    useEffect(() => {
+
+        if (user) {
+            // Fetch chatrooms when the user is logged in
+            const fetchChatrooms = async () => {
+                try {
+                    const response = await client.get('/api/chat', user);
+                    setChatrooms(response.data.chatrooms);
+                } catch (error) {
+                    console.error('Failed to fetch chatrooms:', error);
+                }
+            };
+
+            fetchChatrooms();
+        }
+    }, [user]); // Only run this when the user is available
 
     const handleSelectChatroom = (chatroomId) => {
         setCurrentChatroom(chatroomId);
@@ -14,10 +35,11 @@ const ChatroomList = () => {
 
     return (
         <div>
+            {console.log(chatrooms)}
             {chatrooms.length > 0 ? (
                 <ul>
                     {chatrooms.map((chatroom) => (
-                        <li key={chatroom.id} onClick={() => handleSelectChatroom(chatroom.id)}>
+                        <li className={styles['chatroomInList']} key={chatroom._id} onClick={() => handleSelectChatroom(chatroom.id)}>
                             {chatroom.name}
                         </li>
                     ))}

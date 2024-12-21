@@ -1,6 +1,6 @@
 // src/context/userContext.js
 import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import client from '../tools/axiosClient';
 import { useNavigate } from 'react-router-dom';
 
 // Create UserContext
@@ -11,8 +11,8 @@ export const useUserContext = () => useContext(UserContext);
 // UserProvider component to wrap the app and provide user data
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null); // Store user data
-    const [loading, setLoading] = useState(true); // Track loading state
-    const [error, setError] = useState(null); // Store error if authentication fails
+    const [loading, setLoading] = useState(false); // Track loading state
+    // const [error, setError] = useState(null); // Store error if authentication fails
     // Use effect to fetch user data or validate the JWT token
     useEffect(() => {
         const fetchUser = async () => {
@@ -24,9 +24,10 @@ export const UserProvider = ({ children }) => {
                 }
 
                 // Make an API request to validate the token and fetch user info
-                const response = await axios.get('/api/user', {
+                const response = await client.get('/api/user', {
                     headers: { Authorization: `Bearer ${accessToken}` }
                 });
+                console.log(response.data);
 
                 setUser(response.data); // Store user data
             } catch (error) {
@@ -65,7 +66,7 @@ export const UserProvider = ({ children }) => {
     };
 
     return (
-        <UserContext.Provider value={{ user, loading, error, login, logout }}>
+        <UserContext.Provider value={{ user, loading, login, logout }}>
             {children}
         </UserContext.Provider>
     );

@@ -85,7 +85,7 @@ function App() {
       path: "/chat",
       element: (
         <>
-          {/* <Header /> */}
+          <Header />
           <LoadingScreen/>
           <main>
             <ChatProvider>

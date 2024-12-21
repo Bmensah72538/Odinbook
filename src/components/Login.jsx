@@ -27,6 +27,8 @@ function Login({}) {
             }
 
             const { access, refresh, userId } = response.data;
+            console.log(response.data);
+            console.log(access);
             login(access, refresh, userId);
         } catch (error) {
             console.error('Login failed:', error);
@@ -55,13 +57,13 @@ function Login({}) {
                     <button
                         type="submit"
                         className={styles['login-button']}
-                        disabled={loading}
+                        disabled={loading || user }
                     >
                         {loading ? 'Logging in...' : 'Log in'}
                     </button>
                 </div>
             </form>
-            {user && <p className={styles.success}>You are logged in!</p>}
+            {user && <p className={styles.success}>You are already logged in!</p>}
             <p>
             Don't have an account?{' '} <button onClick={() => {navigate('/signup')}}>Sign up here</button>
             </p>

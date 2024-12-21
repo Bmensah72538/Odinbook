@@ -9,12 +9,8 @@ const client = axios.create({
 });
 
 const isTokenExpired = (token) => {
-  try {
-    const { exp } = jwtDecode(token);
+  const { exp } = jwtDecode(token);
     return Date.now() >= exp * 1000;
-  } catch {
-    return true;
-  }
 };
 
 const refreshAccessToken = async () => {
@@ -36,15 +32,38 @@ const refreshAccessToken = async () => {
 };
 
 client.interceptors.request.use(
-  (request) => {
+  async (request) => {
     const accessToken = localStorage.getItem('accessToken');
+    let tokenExpired = false; // Default to false
 
-    if (accessToken && !isTokenExpired(accessToken)) {
+    if (accessToken) {
+      try {
+        tokenExpired = isTokenExpired(accessToken);
+      } catch (error) {
+        console.error('Error checking token expiration:', error);
+        tokenExpired = true; // Default to true on error to prevent usage of invalid tokens
+      }
+    }
+
+    if (accessToken && !tokenExpired) {
       request.headers.Authorization = `Bearer ${accessToken}`;
     }
+
     return request;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    console.log('An error occured');
+    // Check if the response has an error message in the body
+    if (error.response && error.response.data && error.response.data.error) {
+      console.error('Error from server:', error.response.data.error);
+      return Promise.reject(new Error(error.response.data.error));
+    }
+
+    // Fallback for cases where no error message is provided
+    return Promise.reject(
+      new Error(error.response?.statusText || 'An unknown error occurred')
+    );
+  }
 );
 
 client.interceptors.response.use(

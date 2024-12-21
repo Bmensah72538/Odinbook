@@ -3,9 +3,10 @@ import Chatroom from "./Chatroom";
 import ChatroomList from "./ChatroomList";
 const Chat = () => {
     const { currentChatroom } = useChatContext();
+    console.log(currentChatroom);
     return (
         <div>
-        { currentChatroom ? (<ChatroomList />) : (<Chatroom />)
+        { currentChatroom ? (<Chatroom />) : (<ChatroomList />) 
         }
         </div>
     )

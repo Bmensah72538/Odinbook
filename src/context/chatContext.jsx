@@ -12,24 +12,6 @@ export const ChatProvider = ({ children }) => {
     const [chatrooms, setChatrooms] = useState([]);
     const [currentChatroom, setCurrentChatroom] = useState(null);
 
-    useEffect(() => {
-        if (user) {
-            // Fetch chatrooms when the user is logged in
-            const fetchChatrooms = async () => {
-                try {
-                    const response = await axios.get('/api/chatrooms', {
-                        headers: { Authorization: `Bearer ${user.token}` },
-                    });
-                    setChatrooms(response.data);
-                } catch (error) {
-                    console.error('Failed to fetch chatrooms:', error);
-                }
-            };
-
-            fetchChatrooms();
-        }
-    }, [user]); // Only run this when the user is available
-
     return (
         <ChatContext.Provider value={{ chatrooms, setChatrooms, currentChatroom, setCurrentChatroom }}>
             {children}
