@@ -11,22 +11,30 @@ export const ChatProvider = ({ children }) => {
     const [chatrooms, setChatrooms] = useState([]);
     const [currentChatroom, setCurrentChatroom] = useState(null);
     const socketInitialized = useRef(false);
+    const isFirstRender = useRef(true); // Track if this is the first render
     const accessToken = localStorage.getItem('accessToken');
 
     useEffect(() => {
-        const initializeSocket = async () => {
-            if (!socketInitialized.current && user && accessToken) { 
-                try {
-                    socketService.connect(accessToken);
-                    socketInitialized.current = true;
-                    console.log('Connected to socket.');
-                } catch (error) {
-                    console.error('Failed to connect to socket.', error);
-                }
-            }
-        };
+        // Skip initialization on first render (on mount)
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
 
-        if (user) {
+        // Only initialize socket if currentChatroom changes
+        if (user && currentChatroom?._id && accessToken) {
+            const initializeSocket = async () => {
+                if (!socketInitialized.current) {
+                    try {
+                        socketService.connect(accessToken);
+                        socketInitialized.current = true;
+                        console.log('Connected to socket.');
+                    } catch (error) {
+                        console.error('Failed to connect to socket.', error);
+                    }
+                }
+            };
+
             initializeSocket();
         }
 
@@ -37,9 +45,9 @@ export const ChatProvider = ({ children }) => {
                 console.log('Disconnected from socket.');
             }
         };
-    }, [user, accessToken]); // Ensure this effect only runs when `user` or `accessToken` changes
+    }, [currentChatroom]); // Trigger only when `currentChatroom` changes
 
-    // Connect to chatroom
+    // Connect to chatroom when `currentChatroom` changes
     useEffect(() => {
         if (currentChatroom?._id && user?._id) {
             const joinChatroomPayload = {
@@ -49,7 +57,7 @@ export const ChatProvider = ({ children }) => {
             console.log(`Attempting to join chatroom as ${user._id}`, currentChatroom);
             socketService.joinChatroom(joinChatroomPayload);
         }
-    }, [currentChatroom]); // Only run if `currentChatroom` or `user` changes
+    }, [currentChatroom, user]); // Only run when `currentChatroom` or `user` changes
 
     return (
         <ChatContext.Provider value={{ chatrooms, setChatrooms, currentChatroom, setCurrentChatroom }}>

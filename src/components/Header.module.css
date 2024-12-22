@@ -1,0 +1,64 @@
+/* Styles for the header and the hamburger menu */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+}
+
+.nav {
+    display: flex;
+}
+
+.nav ul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+}
+
+.nav li {
+    margin-left: 20px;
+}
+
+.nav button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.hamburger .bar {
+    width: 25px;
+    height: 3px;
+    margin: 4px 0;
+    background-color: white;
+}
+
+/* Mobile styles */
+@media screen and (max-width: 768px) {
+    .nav {
+        display: none;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background-color: #333;
+        width: 200px;
+        padding: 10px;
+    }
+
+    .nav.active {
+        display: block;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+}

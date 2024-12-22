@@ -13,32 +13,6 @@ export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null); // Store user data
     const [loading, setLoading] = useState(false); // Track loading state
     // const [error, setError] = useState(null); // Store error if authentication fails
-    // Use effect to fetch user data or validate the JWT token
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const accessToken = localStorage.getItem('accessToken'); // Retrieve accessToken from localStorage
-                if (!accessToken) {
-                    setLoading(false); // No token, stop loading
-                    return;
-                }
-
-                // Make an API request to validate the token and fetch user info
-                const response = await client.get('/api/user', {
-                    headers: { Authorization: `Bearer ${accessToken}` }
-                });
-
-                setUser(response.data); // Store user data
-            } catch (error) {
-                console.error('Authentication failed:', error);
-                setError('Failed to authenticate. Please log in again.');
-            } finally {
-                setLoading(false); // Stop loading regardless of success or failure
-            }
-        };
-
-        fetchUser(); // Call the fetchUser function when the component mounts
-    }, []); // Empty dependency array ensures this effect runs only once
 
     const login = (accessToken, refreshToken, _id) => {
         setUser({
