@@ -27,7 +27,6 @@ export const UserProvider = ({ children }) => {
                 const response = await client.get('/api/user', {
                     headers: { Authorization: `Bearer ${accessToken}` }
                 });
-                console.log(response.data);
 
                 setUser(response.data); // Store user data
             } catch (error) {
@@ -41,28 +40,21 @@ export const UserProvider = ({ children }) => {
         fetchUser(); // Call the fetchUser function when the component mounts
     }, []); // Empty dependency array ensures this effect runs only once
 
-    const login = (accessToken, refreshToken, userId) => {
+    const login = (accessToken, refreshToken, _id) => {
         setUser({
           loggedIn: true,
           accessToken,
           refreshToken,
-          userId,
+          _id,
         });
         localStorage.setItem('accessToken', accessToken); // Store tokens in localStorage
         localStorage.setItem('refreshToken', refreshToken);
-        localStorage.setItem('userId', userId);
     };
 
     const logout = async () => {
-        setUser({
-          loggedIn: false,
-          accessToken: null,
-          refreshToken: null,
-          userId: null,
-        });
+        setUser(null);
         localStorage.removeItem('accessToken'); // Remove tokens from localStorage
         localStorage.removeItem('refreshToken');
-        localStorage.removeItem('userId');
     };
 
     return (

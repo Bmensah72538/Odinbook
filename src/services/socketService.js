@@ -1,23 +1,25 @@
 // socketService.js
 import { io } from 'socket.io-client';
 
+const apiURL = import.meta.env.VITE_API_URL;
+
 class SocketService {
   constructor() {
     this.socket = null;
   }
 
   connect(token) {
-    this.socket = io('your-server-url', {
+    this.socket = io(apiURL, {
       auth: { token }, // Send the token for authentication
     });
   }
 
-  joinChatroom(chatroomId, userId) {
-    this.socket.emit('joinChatroom', { chatroomId, userId });
+  joinChatroom(joinChatroomPayload) {
+    this.socket.emit('joinChatroom', joinChatroomPayload);
   }
 
-  sendMessage(chatroomId, messageText, userId) {
-    this.socket.emit('sendMessage', { chatroomId, messageText, userId });
+  sendMessage(messagePayload) {
+    this.socket.emit('sendMessage', messagePayload);
   }
 
   getMessages(chatroomId, callback) {

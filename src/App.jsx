@@ -28,7 +28,7 @@ function App() {
           <LoadingScreen/>
           <Header/>
           <main>
-            <Home />
+            <Home key={user} />
           </main>
           <Footer />
         </>
@@ -36,7 +36,7 @@ function App() {
           <>
           <LoadingScreen/>
           <main>
-            <LandingPage />
+            <LandingPage key={'Guest'}/>
           </main>
           <Footer />
         </>

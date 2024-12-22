@@ -26,10 +26,8 @@ function Login({}) {
                 return;
             }
 
-            const { access, refresh, userId } = response.data;
-            console.log(response.data);
-            console.log(access);
-            login(access, refresh, userId);
+            const { access, refresh, _id } = response.data;
+            login(access, refresh, _id);
         } catch (error) {
             console.error('Login failed:', error);
             setError('An unexpected error occurred. Please try again.');

@@ -23,31 +23,34 @@ const ChatroomList = () => {
                     console.error('Failed to fetch chatrooms:', error);
                 }
             };
-
             fetchChatrooms();
         }
     }, [user]); // Only run this when the user is available
 
-    const handleSelectChatroom = (chatroomId) => {
-        setCurrentChatroom(chatroomId);
-        socketService.joinChatroom(chatroomId);
+    const handleSelectChatroom = (chatroom) => {
+        setCurrentChatroom(chatroom);
+        socketService.joinChatroom(chatroom._id);
     };
 
     return (
         <div>
-            {console.log(chatrooms)}
-            {chatrooms.length > 0 ? (
-                <ul>
-                    {chatrooms.map((chatroom) => (
-                        <li className={styles['chatroomInList']} key={chatroom._id} onClick={() => handleSelectChatroom(chatroom.id)}>
-                            {chatroom.name}
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <p>You are not part of any chatrooms</p>
-            )}
+        {Array.isArray(chatrooms) && chatrooms.length > 0 ? (
+            <ul>
+                {chatrooms.map((chatroom) => (
+                    <li 
+                        className={styles['chatroomInList']} 
+                        key={chatroom._id} 
+                        onClick={() => handleSelectChatroom(chatroom)}
+                    >
+                        {chatroom.name}
+                    </li>
+                ))}
+            </ul>
+        ) : (
+            <p>You are not part of any chatrooms</p>
+        )}
         </div>
+
     );
 };
 
