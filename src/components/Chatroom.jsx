@@ -7,7 +7,7 @@ import client from '../tools/axiosClient';
 import { useUserContext } from '../context/userContext';
 
 const Chatroom = () => {
-    const { currentChatroom } = useChatContext();
+    const { currentChatroom, setCurrentChatroom } = useChatContext();
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const { user } = useUserContext(); 
@@ -21,7 +21,14 @@ const Chatroom = () => {
 
     const fetchInitialMessages = async () => {
         try {
-            const databaseMessages = await client.get(`/api/chat/${currentChatroom._id}/messages`);
+            // Fetch messages from database
+            const databaseResponse = await client.get(`/api/chat/${currentChatroom._id}/messages`);
+            const databaseMessages = databaseResponse.data.messages;
+            console.log('Fetched initial messages from database: ', databaseMessages);
+            // Add usernames to messages
+            for (let i = 0; i < databaseMessages.length; i++) {
+                databaseMessages[i].authorUsername = await getUsernameFromId(databaseMessages[i].author);
+            }
             setMessages(databaseMessages);
         } catch (error) {
             console.error('Failed to fetch initial messages from database.');
@@ -30,8 +37,8 @@ const Chatroom = () => {
     
     const handleSendMessage = async () => {
         const messagePayload = {
-            currentChatroom,
-            newMessage, 
+            chatroomId: currentChatroom._id,
+            messageText: newMessage, 
             userId: user._id,
         }
         console.log(messagePayload);
@@ -45,15 +52,27 @@ const Chatroom = () => {
         
         setNewMessage('');
     };
+    const getUsernameFromId = async (userId) => {
+        let username;
+        try {
+            username = await client.get(`/api/user/${userId}`);
+            return username.data.username;
+        } catch (error) {
+            console.log('Failed to get username from id');
+            return 'Unknown';
+        }
+        
+    };
 
     return (
+        <>
         <div>
             <div>
                 { ( Array.isArray(messages) && messages.length > 0 ) ? 
                     (
                         messages.map((msg, index) => (
                         <div key={index}>
-                            <strong>{msg.author}</strong>: {msg.messageText}
+                            <strong>{msg.authorUsername}</strong> {msg.date}: {msg.messageText}
                         </div>
                     ))
                     ) : 
@@ -70,6 +89,10 @@ const Chatroom = () => {
             />
             <button onClick={handleSendMessage}>Send</button>
         </div>
+        <button onClick={()=>{
+            setCurrentChatroom(null);
+        }}>Go back</button>
+        </>
     );
 };
 

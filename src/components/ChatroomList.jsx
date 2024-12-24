@@ -29,7 +29,6 @@ const ChatroomList = () => {
 
     const handleSelectChatroom = (chatroom) => {
         setCurrentChatroom(chatroom);
-        socketService.joinChatroom(chatroom._id);
     };
 
     return (

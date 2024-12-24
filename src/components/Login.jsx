@@ -6,34 +6,20 @@ import { useUserContext } from '../context/userContext';
 
 
 function Login({}) {
-    const [loading, setLoading] = useState(false);
+    const [loggingIn, setLoggingIn] = useState(false);
     const [error, setError] = useState(null);
-    const { user, login, logout } = useUserContext();
+    const { user, login } = useUserContext();
 
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { username, password } = Object.fromEntries(new FormData(e.target));
+        const loginPayload = Object.fromEntries(new FormData(e.target));
 
-        setLoading(true);
+        setLoggingIn(true);
         setError(null); // Reset error state
 
-        try {
-            const response = await client.post('/api/login', { username, password });
-
-            if (response.data?.error) {
-                setError(response.data.error);
-                return;
-            }
-
-            const { access, refresh, _id } = response.data;
-            login(access, refresh, _id);
-        } catch (error) {
-            console.error('Login failed:', error);
-            setError('An unexpected error occurred. Please try again.');
-        } finally {
-            setLoading(false);
-        }
+        login(loginPayload);
+        
     };
 
     return (
@@ -55,13 +41,14 @@ function Login({}) {
                     <button
                         type="submit"
                         className={styles['login-button']}
-                        disabled={loading || user }
+                        disabled={loggingIn || user }
                     >
-                        {loading ? 'Logging in...' : 'Log in'}
+                        {loggingIn ? 'Logging in...' : 'Log in'}
                     </button>
                 </div>
             </form>
             {user && <p className={styles.success}>You are already logged in!</p>}
+            {console.log(user)}
             <p>
             Don't have an account?{' '} <button onClick={() => {navigate('/signup')}}>Sign up here</button>
             </p>

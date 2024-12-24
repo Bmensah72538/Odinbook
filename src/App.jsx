@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // Contexts
 import { LoadingProvider } from './context/loadingContext'; 
-import { useUserContext } from './context/userContext';
+import { useUserContext, UserProvider } from './context/userContext';
 import { ChatProvider } from './context/chatContext';
 
 // UI Components
@@ -17,41 +17,37 @@ import Signup from './components/Signup';
 import Chat from './components/Chat';
 
 function App() {
-  // Check if the user is logged in when the app mounts
+
   const { user } = useUserContext();
 
   const router = createBrowserRouter([
     {
       path: "/",
-      element:  user ? (
+      element: user ? (
           <>
           <LoadingScreen/>
           <Header/>
           <main>
-            <Home key={user} />
+            <Home key={user._id}/>
           </main>
           <Footer />
         </>
-        ) : (
+      ) : (
           <>
+          {console.log('User is not logged in.')}
           <LoadingScreen/>
           <main>
             <LandingPage key={'Guest'}/>
           </main>
           <Footer />
         </>
-        ),
+      )
     },
     {
-      path: "/login",
+      path: "/landing",
       element: (
         <>
-          {/* <Header /> */}
-          <LoadingScreen/>
-          <main>
-          <Signup />
-          </main>
-          <Footer />
+        You landed! But there's nothing here.
         </>
       ),
     },
@@ -72,10 +68,10 @@ function App() {
       path: "/dashboard",
       element: (
         <>
-          {/* <Header /> */}
+          <Header/>
           <LoadingScreen/>
           <main>
-          <div>Dashboard! Yes, that's all that's here.</div>
+          <div>Dashboard! Yes, that's all that's here. For now.i</div>
           </main>
           <Footer />
         </>
@@ -100,7 +96,7 @@ function App() {
   return (
     <>    
     <LoadingProvider>
-      <RouterProvider router={router} />
+          <RouterProvider router={router} />
     </LoadingProvider>
     </>
   )

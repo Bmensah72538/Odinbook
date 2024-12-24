@@ -23,6 +23,7 @@ const refreshAccessToken = async () => {
   try {
     const response = await client.post('/refresh', { refreshToken });
     const { accessToken } = response.data;
+    console.log('Refreshed access token:', accessToken);
     localStorage.setItem('accessToken', accessToken);
     return accessToken;
   } catch (error) {
@@ -38,6 +39,7 @@ client.interceptors.request.use(
 
     if (accessToken) {
       try {
+        console.log(accessToken, typeof accessToken)
         tokenExpired = isTokenExpired(accessToken);
       } catch (error) {
         console.error('Error checking token expiration:', error);
