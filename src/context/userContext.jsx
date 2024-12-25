@@ -41,35 +41,49 @@ export const UserProvider = ({ children }) => {
 
     const login = async (loginPayload) => {
         try {
-            if(loginPayload.accessToken) {
-                console.log('Logging in with access token...');
-                const user = await client.get('api/user');
-                setUser({
-                    loggedIn: true,
-                    _id: user.data._id,
-                });
-                console.log('Logged in!');
+            if (loginPayload.accessToken) {
+                await loginWithAccessToken();
             } else if (loginPayload.username && loginPayload.password) {
-                console.log('Logging in with username and password...');
-                const user = await client.post('api/login', loginPayload);
+                await loginWithCredentials(loginPayload);
+            } else {
+                console.error('Invalid login payload');
+            }
+        } catch (error) {
+            console.error('Failed to log in. Error: ', error);
+        }
+    };
+    
+    const loginWithAccessToken = async () => {
+        console.log('Logging in with access token...');
+        const user = await client.get('api/user');
+        setUser({
+            loggedIn: true,
+            _id: user.data._id,
+        });
+        console.log('Logged in!');
+    };
+    
+    const loginWithCredentials = async (loginPayload) => {
+        console.log('Logging in with username and password...');
+        try {
+            const user = await client.post('api/login', loginPayload);
+            if (user.data.accessToken) {
                 localStorage.setItem('accessToken', user.data.accessToken);
                 console.log(`Access token set: ${user.data.accessToken}`);
                 localStorage.setItem('refreshToken', user.data.refreshToken);
-                console.log(`Refresh token set: ${user.data.accessToken}`);
+                console.log(`Refresh token set: ${user.data.refreshToken}`);
                 setUser({
                     loggedIn: true,
                     _id: user.data._id,
                 });
                 console.log('Logged in!');
             } else {
-                console.error('Invalid login payload');
-                return;
-            }    
+                console.error('Access token not found in response');
+            }
         } catch (error) {
-           console.error('Failed to log in. Error: ', error); 
-        } 
+            console.error('Failed to log in. Error: ', error);
+        }
     };
-
     const logout = async () => {
         console.log('Logging out...')
         setUser(null);
