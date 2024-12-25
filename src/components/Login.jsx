@@ -14,11 +14,17 @@ function Login({}) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const loginPayload = Object.fromEntries(new FormData(e.target));
-
         setLoggingIn(true);
         setError(null); // Reset error state
-
-        login(loginPayload);
+        try {
+            await login(loginPayload);
+            setLoggingIn(false);    
+        } catch (error) {
+            console.error('Failed to log in. Error: ', error);
+            setLoggingIn(false);
+            setError('Failed to log in. Please try again.');
+        }
+        
         
     };
 
