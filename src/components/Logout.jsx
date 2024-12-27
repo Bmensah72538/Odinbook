@@ -8,19 +8,14 @@ const Logout = () => {
     const { user, logout } = useUserContext();
     const navigate = useNavigate();
     const handleLogout = async () => {
-        console.log('Begin logout...')
         setLoading(true);
-        logout();
         try {
-            navigate('/');
-            const response = await client.post('/api/logout', user); 
+            const heyThere = await logout();
         } catch (error) {
-            console.log('Failed to logout.');
-            alert('Failed to logout. Please try again.')
-            return;
+            console.error('Failed to log out. Error: ', error);
         } finally {
-            console.log('End logout.')
             setLoading(false);
+            navigate('/');
         }
     }
 

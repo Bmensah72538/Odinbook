@@ -13,8 +13,20 @@ export const UserProvider = ({ children }) => {
     const [loading, setLoading] = useState(false); // Track loading state
     // const [error, setError] = useState(null); // Store error if authentication fails
     
+    // Get tokens from localStorage
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
+
+    // Remove tokens from localStorage
+    const removeTokens = () => {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+    };
+    // Generate an error message and log it to the console
+    const generateError = (message) => {
+        const error = new Error(message);
+        throw error;
+    }
 
     // Check if the user is logged in when the app mounts
     useEffect(() =>{
@@ -42,24 +54,30 @@ export const UserProvider = ({ children }) => {
     const login = async (loginPayload) => {
         try {
             if (loginPayload.accessToken) {
-                await loginWithAccessToken();
+                return await loginWithAccessToken();
             } else if (loginPayload.username && loginPayload.password) {
-                await loginWithCredentials(loginPayload);
+                return await loginWithCredentials(loginPayload);
             } else {
-                console.error('Invalid login payload');
+                generateError('Invalid login payload');
             }
         } catch (error) {
-            console.error('Failed to log in. Error: ', error);
+            throw error;
         }
     };
     
     const loginWithAccessToken = async () => {
         console.log('Logging in with access token...');
-        const user = await client.get('api/user');
-        setUser({
-            loggedIn: true,
-            _id: user.data._id,
-        });
+        try {
+            const user = await client.get('api/user');
+            setUser({
+                loggedIn: true,
+                _id: user.data._id,
+            });
+        } catch (error) {
+            setUser(null);
+            removeTokens();
+            throw error;
+        }
         console.log('Logged in!');
     };
     
@@ -78,17 +96,24 @@ export const UserProvider = ({ children }) => {
                 });
                 console.log('Logged in!');
             } else {
-                console.error('Access token not found in response');
+                generateError('Failed to log in');
             }
         } catch (error) {
-            console.error('Failed to log in. Error: ', error);
+            throw error;
         }
     };
     const logout = async () => {
         console.log('Logging out...')
         setUser(null);
-        localStorage.removeItem('accessToken'); // Remove tokens from localStorage
-        localStorage.removeItem('refreshToken');
+        removeTokens();
+        try {
+            const response = await client.post('/api/logout', user); 
+        } catch (error) {
+            throw error;
+        } finally {
+            console.log('End logout.')
+            setLoading(false);
+        }
         console.log('Logged out.');
     };
 

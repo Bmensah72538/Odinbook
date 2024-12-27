@@ -22,10 +22,8 @@ function Login({}) {
         } catch (error) {
             console.error('Failed to log in. Error: ', error);
             setLoggingIn(false);
-            setError('Failed to log in. Please try again.');
+            setError(error.message);
         }
-        
-        
     };
 
     return (
@@ -54,7 +52,6 @@ function Login({}) {
                 </div>
             </form>
             {user && <p className={styles.success}>You are already logged in!</p>}
-            {console.log(user)}
             <p>
             Don't have an account?{' '} <button onClick={() => {navigate('/signup')}}>Sign up here</button>
             </p>
