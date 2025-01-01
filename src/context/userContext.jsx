@@ -11,11 +11,21 @@ export const useUserContext = () => useContext(UserContext);
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null); // Store user data
     const [loading, setLoading] = useState(false); // Track loading state
+    const [accessToken, setAccessToken] = useState(null); // Store access token
+    const [refreshToken, setRefreshToken] = useState(null); // Store refresh token
     // const [error, setError] = useState(null); // Store error if authentication fails
-    
-    // Get tokens from localStorage
-    const accessToken = localStorage.getItem('accessToken');
-    const refreshToken = localStorage.getItem('refreshToken');
+
+    // Add tokens to state from localStorage
+    const addToken = () => {
+        const accessToken = localStorage.getItem('accessToken');
+        const refreshToken = localStorage.getItem('refreshToken');
+        if(accessToken) {
+            setAccessToken(accessToken);
+        }
+        if(refreshToken) {
+            setRefreshToken(refreshToken);
+        }
+    };
 
     // Remove tokens from localStorage
     const removeTokens = () => {
@@ -39,7 +49,7 @@ export const UserProvider = ({ children }) => {
                     await login({ accessToken });
                     setLoading(false);
                 } catch (error) {
-                    console.error('Failed to refresh tokens. Logging out...');
+                    console.error('Failed to log in with access token:', error);
                     await logout();
                     setLoading(false);
                 }
@@ -68,10 +78,12 @@ export const UserProvider = ({ children }) => {
     const loginWithAccessToken = async () => {
         console.log('Logging in with access token...');
         try {
-            const user = await client.get('api/user');
+            const response = await client.get('api/user');
+            console.log(response.data);
             setUser({
                 loggedIn: true,
-                _id: user.data._id,
+                _id: response.data._id,
+                username: response.data.username
             });
         } catch (error) {
             setUser(null);
@@ -84,15 +96,15 @@ export const UserProvider = ({ children }) => {
     const loginWithCredentials = async (loginPayload) => {
         console.log('Logging in with username and password...');
         try {
-            const user = await client.post('api/login', loginPayload);
-            if (user.data.accessToken) {
-                localStorage.setItem('accessToken', user.data.accessToken);
-                console.log(`Access token set: ${user.data.accessToken}`);
-                localStorage.setItem('refreshToken', user.data.refreshToken);
-                console.log(`Refresh token set: ${user.data.refreshToken}`);
+            const response = await client.post('api/login', loginPayload);
+            if (response.data.accessToken) {
+                localStorage.setItem('accessToken', response.data.accessToken);
+                localStorage.setItem('refreshToken', response.data.refreshToken);
+                addToken();
                 setUser({
                     loggedIn: true,
-                    _id: user.data._id,
+                    _id: response.data._id,
+                    username: response.data.username,
                 });
                 console.log('Logged in!');
             } else {

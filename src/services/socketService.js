@@ -22,7 +22,7 @@ class SocketService {
     this.socket.emit('sendMessage', messagePayload);
   }
 
-  getMessages(chatroomId, callback) {
+  getMessages(callback) {
     this.socket.on('getMessages', callback);
   }
 

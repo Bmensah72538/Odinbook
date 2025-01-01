@@ -7,61 +7,16 @@ import client from '../tools/axiosClient';
 import { useUserContext } from '../context/userContext';
 
 const Chatroom = () => {
-    const { currentChatroom, setCurrentChatroom } = useChatContext();
-    const [messages, setMessages] = useState([]);
+    const { currentChatroom, setCurrentChatroom, sendMessage, messages } = useChatContext();
     const [newMessage, setNewMessage] = useState('');
-    const { user } = useUserContext(); 
 
-    useEffect(() => {
-        if (currentChatroom) {
-            // fetch initial messages from backend
-            fetchInitialMessages();
-        }
-    }, [currentChatroom]);
-
-    const fetchInitialMessages = async () => {
-        try {
-            // Fetch messages from database
-            const databaseResponse = await client.get(`/api/chat/${currentChatroom._id}/messages`);
-            const databaseMessages = databaseResponse.data.messages;
-            console.log('Fetched initial messages from database: ', databaseMessages);
-            // Add usernames to messages
-            for (let i = 0; i < databaseMessages.length; i++) {
-                databaseMessages[i].authorUsername = await getUsernameFromId(databaseMessages[i].author);
-            }
-            setMessages(databaseMessages);
-        } catch (error) {
-            console.error('Failed to fetch initial messages from database.');
-        }
-    };
-    
     const handleSendMessage = async () => {
-        const messagePayload = {
-            chatroomId: currentChatroom._id,
-            messageText: newMessage, 
-            userId: user._id,
-        }
-        console.log(messagePayload);
         try {
-            console.log('Attempting to send message...')
-            await socketService.sendMessage(messagePayload);
-            console.log('Message sent! Payload: ', messagePayload)
+            sendMessage(newMessage);
+            setNewMessage('');
         } catch (error) {
-            console.error('Failed to send message. Payload: ', messagePayload);
-        }
-        
-        setNewMessage('');
-    };
-    const getUsernameFromId = async (userId) => {
-        let username;
-        try {
-            username = await client.get(`/api/user/${userId}`);
-            return username.data.username;
-        } catch (error) {
-            console.log('Failed to get username from id');
-            return 'Unknown';
-        }
-        
+            console.error('Failed to send message.', error);
+        } 
     };
 
     return (

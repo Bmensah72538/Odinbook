@@ -39,7 +39,6 @@ client.interceptors.request.use(
 
     if (accessToken) {
       try {
-        console.log(accessToken, typeof accessToken)
         tokenExpired = isTokenExpired(accessToken);
       } catch (error) {
         console.error('Error checking token expiration:', error);

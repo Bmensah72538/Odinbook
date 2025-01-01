@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const LoadingContext = createContext();
 
 // Create a custom hook to use the loading context
-export const useLoading = () => useContext(LoadingContext);
+export const useLoadingContext = () => useContext(LoadingContext);
 
 // Create a provider component
 export const LoadingProvider = ({ children }) => {
@@ -20,7 +20,7 @@ export const LoadingProvider = ({ children }) => {
   }, []);
 
   return (
-    <LoadingContext.Provider value={{ isLoading }}>
+    <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
       {children}
     </LoadingContext.Provider>
   );

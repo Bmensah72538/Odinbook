@@ -38,12 +38,12 @@ function Signup() {
                 ...credentials,
             });
 
-            if (response.data?.error) {
-                setError(response.data.error);
+            if (response.data?.errors) {
+                setError(response.data.errors);
                 setLoading(false);
                 return;
-            }
-
+            } else
+            console.log(response.data.error);
             const accessToken = response.data.access.token.split(' ')[1];
             const refreshToken = response.data.refresh.token.split(' ')[1];
             const userId = response.data.userId;
@@ -105,7 +105,15 @@ function Signup() {
                     </button>
                 </div>
             </form>
-            {error && <p className="error">{error}</p>}
+            {error && <div className="error">{
+                Array.isArray(error) ? (
+                    error.map((err, index) => (
+                        <ul key={index}>{err}</ul>
+                    ))
+                ) : (
+                    <p>error</p>
+                )
+                }</div>}
             <p>
                 Have an account? <button onClick={() => { navigate('/'); }}>Login here</button>
             </p>

@@ -95,9 +95,7 @@ function App() {
   ]);
   return (
     <>    
-    <LoadingProvider>
           <RouterProvider router={router} />
-    </LoadingProvider>
     </>
   )
 }
