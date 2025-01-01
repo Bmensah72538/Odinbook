@@ -11,6 +11,7 @@ const Chatroom = () => {
     const [newMessage, setNewMessage] = useState('');
 
     const handleSendMessage = async () => {
+        e.preventDefault();
         try {
             sendMessage(newMessage);
             setNewMessage('');
@@ -36,13 +37,15 @@ const Chatroom = () => {
                     )  
                 }
             </div>
-            <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type a message"
-            />
-            <button onClick={handleSendMessage}>Send</button>
+            <form onSubmit={handleSendMessage}>
+                <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Type a message"
+                />
+                <button type='submit'>Send</button>
+            </form>
         </div>
         <button onClick={()=>{
             setCurrentChatroom(null);
