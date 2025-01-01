@@ -10,7 +10,7 @@ const Chatroom = () => {
     const { currentChatroom, setCurrentChatroom, sendMessage, messages } = useChatContext();
     const [newMessage, setNewMessage] = useState('');
 
-    const handleSendMessage = async () => {
+    const handleSendMessage = async (e) => {
         e.preventDefault();
         try {
             sendMessage(newMessage);
