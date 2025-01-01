@@ -61,6 +61,29 @@ export const UserProvider = ({ children }) => {
         checkLoggedIn();
     }, [accessToken]); 
 
+    const signup = async (signupPayload) => {
+                try {
+                    const response = await client.post('/api/signup', signupPayload);
+                    console.log(response.data);
+                    if (response.data?.errors) {
+                        console.log(response.data.errors);
+                        throw response.data.errors;
+                    }
+                    if (response.data?.error) {
+                        console.log(response.data.error);
+                        throw response.data.error;
+                    }
+                    const { accessToken, refreshToken, userId } = response.data;
+
+                    // Login user
+                    await login({accessToken});
+
+                } catch (err) {
+                    throw err;
+                }
+                setLoading(false);
+    }
+
     const login = async (loginPayload) => {
         try {
             if (loginPayload.accessToken) {
@@ -130,7 +153,7 @@ export const UserProvider = ({ children }) => {
     };
 
     return (
-        <UserContext.Provider value={{ user, loading, login, logout }}>
+        <UserContext.Provider value={{ user, loading, signup, login, logout }}>
             {children}
         </UserContext.Provider>
     );

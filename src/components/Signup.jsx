@@ -8,9 +8,9 @@ function Signup() {
     const [credentials, setCredentials] = useState({ username: '', password: '', email: '' });
     const [confirmPassword, setConfirmPassword] = useState(''); // Separate state for password confirmation
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [signingUp, setSigningUp] = useState(false);
     const navigate = useNavigate();
-    const { user, login, logout} = useUserContext();
+    const { signup } = useUserContext();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -22,43 +22,23 @@ function Signup() {
     };
 
     const handleSubmit = async (e) => {
-        
         e.preventDefault();
-        setLoading(true); // Set loading state
+        const signupPayload = Object.fromEntries(new FormData(e.target));
+        setError(null); 
+        setSigningUp(true);
         if (credentials.password !== confirmPassword) {
             setError('Passwords do not match');
-            setLoading(false);
+            setSigningUp(false);
             return;
         }
-
-        setError(null); // Reset error state
-
         try {
-            const response = await client.post('/api/signup', {
-                ...credentials,
-            });
-
-            if (response.data?.errors) {
-                setError(response.data.errors);
-                setLoading(false);
-                return;
-            } else
-            console.log(response.data.error);
-            const accessToken = response.data.access.token.split(' ')[1];
-            const refreshToken = response.data.refresh.token.split(' ')[1];
-            const userId = response.data.userId;
-
-            // Login user
-            await login(accessToken, refreshToken, userId);
-            // Navigate user to dashboard
-            await navigate('/dashboard');
-        } catch (err) {
-            // Handle network or unexpected errors
-            setError(err.response?.data?.error || 'An unexpected error occurred. Please try again.');
-            setLoading(false);
-            console.error('Signup error:', err);
-        }
-        setLoading(false);
+            await signup(signupPayload);
+            setSigningUp(false);
+            navigate('/');
+        } catch (error) {
+            setError(error);
+            setSigningUp(false);
+        };
     };
 
     return (
@@ -101,7 +81,7 @@ function Signup() {
                         className={styles['login-button']}
                         type="submit"
                     >
-                        {loading ? ('Signing up...') : ('Sign Up')}
+                        {signingUp ? ('Signing up...') : ('Sign Up')}
                     </button>
                 </div>
             </form>
@@ -111,7 +91,7 @@ function Signup() {
                         <ul key={index}>{err}</ul>
                     ))
                 ) : (
-                    <p>error</p>
+                    <p>{error}</p>
                 )
                 }</div>}
             <p>
