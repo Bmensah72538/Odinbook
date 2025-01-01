@@ -63,8 +63,9 @@ export const UserProvider = ({ children }) => {
 
     const signup = async (signupPayload) => {
                 try {
+                    console.log('Signing up...');
                     const response = await client.post('/api/signup', signupPayload);
-                    console.log(response.data);
+
                     if (response.data?.errors) {
                         console.log(response.data.errors);
                         throw response.data.errors;
@@ -74,10 +75,10 @@ export const UserProvider = ({ children }) => {
                         throw response.data.error;
                     }
                     const { accessToken, refreshToken, userId } = response.data;
-
+                    localStorage.setItem('accessToken', accessToken);
                     // Login user
                     await login({accessToken});
-
+                    console.log('Signed up!');
                 } catch (err) {
                     throw err;
                 }
