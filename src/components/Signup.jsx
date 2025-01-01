@@ -91,7 +91,7 @@ function Signup() {
                         <ul key={index}>{err}</ul>
                     ))
                 ) : (
-                    <p>{error}</p>
+                    <p>An unexpected error occured.</p>
                 )
                 }</div>}
             <p>
