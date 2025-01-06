@@ -10,9 +10,11 @@ import he from 'he';
 dayjs.extend(relativeTime);
 
 const Chatroom = () => {
-    const { currentChatroom, setCurrentChatroom, sendMessage, messages } = useChatContext();
+    const { chatrooms, currentChatroom, setCurrentChatroom, sendMessage, messages } = useChatContext();
     const [newMessage, setNewMessage] = useState('');
-
+    const activeChatroom = chatrooms.find((chatroom) => {
+        return chatroom._id = currentChatroom;
+    })
     const handleSendMessage = async (e) => {
         e.preventDefault();
         try {
@@ -27,9 +29,9 @@ const Chatroom = () => {
         <>
         <div>
             <div>
-                { ( Array.isArray(currentChatroom.messages) && currentChatroom.messages.length > 0 ) ? 
+                { ( Array.isArray(activeChatroom.messages) && activeChatroom.messages.length > 0 ) ? 
                     (
-                        currentChatroom.messages.map((msg, index) => (
+                        activeChatroom.messages.map((msg, index) => (
                         <div className={styles['chatMessage']} key={index}>
                             <strong className={styles['username']}>{msg.author.username}</strong> 
                             <p className={styles['timestamp']}>{dayjs(msg.date).fromNow()}</p>  {/* Format date here */}

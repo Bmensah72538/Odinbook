@@ -11,10 +11,11 @@ export const useChatContext = () => useContext(ChatContext);
 export const ChatProvider = ({ children }) => {
     const { isLoading, setIsLoading } = useLoadingContext(); // Get loading state from LoadingContext
     const { user } = useUserContext(); // Get user info from UserContext
-    const [chatrooms, setChatrooms] = useState([]);
+    const [chatrooms, setChatrooms] = useState(null);
     const [currentChatroom, setCurrentChatroom] = useState(null);
     const socketInitialized = useRef(false);
     const accessToken = localStorage.getItem('accessToken');
+    const chatroomsRef = useRef(chatrooms);
 
     // Initialize socket connection
     useEffect(() => {
@@ -54,6 +55,14 @@ export const ChatProvider = ({ children }) => {
                 try {
                     setIsLoading(true);
                     const response = await client.get('/api/chat', user);
+
+                    if (!response.data || !response.data.chatrooms) {
+                        throw new Error('No chatrooms found in response');
+                    }
+                    if(response.data.error) {
+                        throw response.data.error;
+                    }
+
                     setChatrooms(response.data.chatrooms);
                     setIsLoading(false);
                 } catch (error) {
@@ -65,8 +74,16 @@ export const ChatProvider = ({ children }) => {
         }
     }, [user]); // Only run when `user` changes
 
+    // Update ref whenever chatrooms changes. 
+    useEffect(() => {
+        chatroomsRef.current = chatrooms;
+    }, [chatrooms]); 
+
     // Connect to chatroom sockets after chatrooms are fetched
     useEffect(() => {
+        if (!user) {
+            return;
+        }
         if (chatrooms) {
             chatrooms.forEach((chatroom) => {
                 socketService.joinChatroom({
@@ -84,7 +101,7 @@ export const ChatProvider = ({ children }) => {
             throw new Error('No chatroom selected.');
         }
         const messagePayload = {
-            chatroomId: currentChatroom._id,
+            chatroomId: currentChatroom,
             messageText: newMessage, 
             userId: user._id,
             authorUsername: user.username,
@@ -93,28 +110,22 @@ export const ChatProvider = ({ children }) => {
             console.log('Attempting to send message...')
             await socketService.sendMessage(messagePayload);
             console.log('Message sent! Payload: ', messagePayload)
+            console.log(chatrooms);
         } catch (error) {
             console.error('Failed to send message. Payload: ', messagePayload, error);
         }
     };
     const handleNewMessage = async (newMessage) => {
         console.log('Received new message:', newMessage);
-        const chatroom = chatrooms.find(chatroom => chatroom._id === newMessage.chatroomId);
-        console.log(chatroom);
+        const latestChatrooms = chatroomsRef.current;
+        const chatroom = latestChatrooms.find(chatroom => chatroom._id === newMessage.chatroomId);
         if (chatroom) {
-            // Add the new message to the chatroom's messages
-            chatroom.messages.push(newMessage);
-    
-            // Update the state by using the previous state to ensure you have the latest chatrooms list
-            setChatrooms((prevChatrooms) => {
-                const updatedChatrooms = prevChatrooms.map((room) => 
-                    room._id === chatroom._id 
-                        ? { ...room, messages: [...room.messages, newMessage] }
-                        : room
-                );
-                return [...updatedChatrooms]; 
-            });
-            
+            const updatedChatrooms = chatroomsRef.current.map((room) => 
+                room._id === chatroom._id
+                    ? { ...room, messages: [...room.messages, newMessage] } 
+                    : room
+            );
+            setChatrooms(updatedChatrooms);
         }
     };
     
