@@ -4,6 +4,7 @@ import { useChatContext } from '../context/chatContext';
 import styles from './Chatroom.module.css';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import he from 'he';
 
 // Extend dayjs with the relativeTime plugin
 dayjs.extend(relativeTime);
@@ -32,7 +33,7 @@ const Chatroom = () => {
                         <div className={styles['chatMessage']} key={index}>
                             <strong className={styles['username']}>{msg.author.username}</strong> 
                             <p className={styles['timestamp']}>{dayjs(msg.date).fromNow()}</p>  {/* Format date here */}
-                            <p className={styles['messageText']}>{msg.messageText}</p>
+                            <p className={styles['messageText']}>{he.decode(msg.messageText)}</p>
                         </div>
                     ))
                     ) : 
