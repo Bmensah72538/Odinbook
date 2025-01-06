@@ -1,16 +1,17 @@
 // src/components/Chatroom.js
-
 import { useState, useEffect } from 'react';
 import { useChatContext } from '../context/chatContext';
-import socketService from '../services/socketService';
-import client from '../tools/axiosClient';
-import { useUserContext } from '../context/userContext';
+import styles from './Chatroom.module.css';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+// Extend dayjs with the relativeTime plugin
+dayjs.extend(relativeTime);
 
 const Chatroom = () => {
     const { currentChatroom, setCurrentChatroom, sendMessage, messages } = useChatContext();
     const [newMessage, setNewMessage] = useState('');
 
-    
     const handleSendMessage = async (e) => {
         e.preventDefault();
         try {
@@ -28,8 +29,10 @@ const Chatroom = () => {
                 { ( Array.isArray(currentChatroom.messages) && currentChatroom.messages.length > 0 ) ? 
                     (
                         currentChatroom.messages.map((msg, index) => (
-                        <div key={index}>
-                            <strong>{msg.author.username}</strong> {msg.date}: {msg.messageText}
+                        <div className={styles['chatMessage']} key={index}>
+                            <strong className={styles['username']}>{msg.author.username}</strong> 
+                            <p className={styles['timestamp']}>{dayjs(msg.date).fromNow()}</p>  {/* Format date here */}
+                            <p className={styles['messageText']}>{msg.messageText}</p>
                         </div>
                     ))
                     ) : 
@@ -48,9 +51,7 @@ const Chatroom = () => {
                 <button type='submit'>Send</button>
             </form>
         </div>
-        <button onClick={()=>{
-            setCurrentChatroom(null);
-        }}>Go back</button>
+        <button onClick={()=>{ setCurrentChatroom(null); }}>Go back</button>
         </>
     );
 };
