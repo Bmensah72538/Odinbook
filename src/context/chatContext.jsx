@@ -26,6 +26,8 @@ export const ChatProvider = ({ children }) => {
                     socketService.connect(accessToken);
                     socketInitialized.current = true;
                     console.log('Connected to socket.');
+                    socketService.onNewMessage(handleNewMessage);
+                    console.log('Now listening for messages.')
                 } catch (error) {
                     console.error('Failed to connect to socket.', error);
                 }
@@ -35,7 +37,6 @@ export const ChatProvider = ({ children }) => {
         // Initialize socket connection only if the user is logged in
         if (accessToken) {
             initializeSocket();
-            socketService.onNewMessage(handleNewMessage);
         };      
         return () => {
             if (socketInitialized.current) {
@@ -44,7 +45,7 @@ export const ChatProvider = ({ children }) => {
                 console.log('Disconnected from socket.');
             }
         };
-    }, []); // Only run once when the component mounts
+    }, [accessToken]); // Only run if the accessToken is removed, or when component mounts
 
     // Fetch chatrooms when the user is logged in
     useEffect(() => {
@@ -99,11 +100,24 @@ export const ChatProvider = ({ children }) => {
     const handleNewMessage = async (newMessage) => {
         console.log('Received new message:', newMessage);
         const chatroom = chatrooms.find(chatroom => chatroom._id === newMessage.chatroomId);
+        console.log(chatroom);
         if (chatroom) {
+            // Add the new message to the chatroom's messages
             chatroom.messages.push(newMessage);
-            setChatrooms([...chatrooms]);
+    
+            // Update the state by using the previous state to ensure you have the latest chatrooms list
+            setChatrooms((prevChatrooms) => {
+                const updatedChatrooms = prevChatrooms.map((room) => 
+                    room._id === chatroom._id 
+                        ? { ...room, messages: [...room.messages, newMessage] }
+                        : room
+                );
+                return [...updatedChatrooms]; 
+            });
+            
         }
     };
+    
     const createChatroom = async (createChatroomPayload) => {
         const { chatroomName, participantNames } = createChatroomPayload;
         const participants = participantNames.split(',').map(name => name.trim());
