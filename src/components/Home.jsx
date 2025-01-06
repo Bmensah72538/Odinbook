@@ -1,7 +1,7 @@
 const Home = () => {
     return (
         <>
-        Nothin here bud.
+        Work in progress.
         </>
     )
 }

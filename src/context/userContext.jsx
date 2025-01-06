@@ -42,6 +42,7 @@ export const UserProvider = ({ children }) => {
     useEffect(() =>{
         const checkLoggedIn = async () => {
             console.log('Checking if user is logged in...');
+            addToken();
             if (accessToken) {
                 console.log('Access token found. Logging in...');
                 try {

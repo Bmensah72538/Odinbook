@@ -10,6 +10,7 @@ const Chatroom = () => {
     const { currentChatroom, setCurrentChatroom, sendMessage, messages } = useChatContext();
     const [newMessage, setNewMessage] = useState('');
 
+    
     const handleSendMessage = async (e) => {
         e.preventDefault();
         try {
@@ -24,11 +25,11 @@ const Chatroom = () => {
         <>
         <div>
             <div>
-                { ( Array.isArray(messages) && messages.length > 0 ) ? 
+                { ( Array.isArray(currentChatroom.messages) && currentChatroom.messages.length > 0 ) ? 
                     (
-                        messages.map((msg, index) => (
+                        currentChatroom.messages.map((msg, index) => (
                         <div key={index}>
-                            <strong>{msg.authorUsername}</strong> {msg.date}: {msg.messageText}
+                            <strong>{msg.author.username}</strong> {msg.date}: {msg.messageText}
                         </div>
                     ))
                     ) : 

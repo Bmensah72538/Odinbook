@@ -14,9 +14,17 @@ const ChatroomList = () => {
 
     return (
         <div>
-            <CreateNewChatroom />
+            <div className={styles['chatroomListHeader']}>
+                {chatrooms ? (
+                    <h2>Chatrooms</h2>
+                ) : (
+                    <h2>You aren't in any chatrooms</h2>
+                )}
+                <CreateNewChatroom />
+            </div>
+            
             {Array.isArray(chatrooms) && chatrooms.length > 0 ? (
-                <ul>
+                <ul className='chatroomList'>
                     {chatrooms.map((chatroom) => (
                         <li 
                             className={styles['chatroomInList']} 
@@ -44,11 +52,18 @@ const ChatroomList = () => {
 const CreateNewChatroom = () => {
     const [creatingChatroom, setCreatingChatroom] = useState(false);
 
-    return creatingChatroom ? (
-        <CreateChatroomForm setCreatingChatroom={setCreatingChatroom} />
-    ) : (
-        <button onClick={() => setCreatingChatroom(true)}>Create new chatroom</button>
-    );
+    const toggleCreatingChatroom = () => {
+        setCreatingChatroom((prev) => !prev);
+    };
+
+    return (
+        <>
+            <button onClick={toggleCreatingChatroom}>
+                {creatingChatroom ? '-' : '+'}
+            </button>
+            {creatingChatroom && <CreateChatroomForm setCreatingChatroom={setCreatingChatroom} />}
+        </>
+    )
 };
 
 const CreateChatroomForm = ({ setCreatingChatroom }) => {
@@ -74,7 +89,7 @@ const CreateChatroomForm = ({ setCreatingChatroom }) => {
     };
     return (
         <>
-            <button onClick={() => setCreatingChatroom(false)}>Cancel</button>
+            {/* <button onClick={() => setCreatingChatroom(false)}>Cancel</button> */}
             <div>
                 <form onSubmit={handleSubmit}>
                 <input type="text" 

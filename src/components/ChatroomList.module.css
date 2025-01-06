@@ -1,3 +1,32 @@
+.chatroomListHeader {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.chatroomList {
+    width: 100%;
+    max-width: 300px;
+    padding: 20px;
+    background-color: #f5f6f7;
+    border-radius: 8px;
+    margin-right: 20px;
+    height: 100%;
+    overflow-y: auto;
+}
+
 .chatroomInList {
-    border: dashed, red;
+    background-color: #f5f6f7;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.chatroomInList:hover {
+    color: #f5f6f7;
+    background-color: #373f47;
 }

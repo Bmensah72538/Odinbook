@@ -71,7 +71,7 @@ function App() {
           <Header/>
           <LoadingScreen/>
           <main>
-          <div>Dashboard! Yes, that's all that's here. For now.i</div>
+          <div>Dashboard! Yes, that's all that's here. For now.</div>
           </main>
           <Footer />
         </>
