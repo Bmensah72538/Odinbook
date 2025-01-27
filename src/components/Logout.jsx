@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUserContext } from "../context/userContext";
 import { useNavigate } from "react-router-dom";
 import client from '../tools/axiosClient';
@@ -10,14 +10,17 @@ const Logout = () => {
     const handleLogout = async () => {
         setLoading(true);
         try {
-            const heyThere = await logout();
+            await logout();
+            console.log('Navigated to home')
         } catch (error) {
             console.error('Failed to log out. Error: ', error);
-        } finally {
-            setLoading(false);
-            navigate('/');
         }
     }
+    useEffect(() => {
+        if(!user) {
+            navigate('/');
+        }
+    }, [user]);
 
     return (
         <>

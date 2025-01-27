@@ -5,6 +5,8 @@ import styles from './Chatroom.module.css';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import he from 'he';
+import ChatSidebar from './ChatSidebar';
+import Chat from './Chat';
 
 // Extend dayjs with the relativeTime plugin
 dayjs.extend(relativeTime);
@@ -27,14 +29,17 @@ const Chatroom = () => {
 
     return (
         <>
+        <ChatSidebar />
         <div>
-            <div>
+            <div className={styles['chatContainer']}>
                 { ( Array.isArray(activeChatroom.messages) && activeChatroom.messages.length > 0 ) ? 
                     (
                         activeChatroom.messages.map((msg, index) => (
                         <div className={styles['chatMessage']} key={index}>
-                            <strong className={styles['username']}>{msg.author.username}</strong> 
-                            <p className={styles['timestamp']}>{dayjs(msg.date).fromNow()}</p>  {/* Format date here */}
+                            <div className={styles['messageHeader']}>
+                                <strong className={styles['username']}>{msg.author.username}</strong>
+                                <p className={styles['timestamp']}>{dayjs(msg.date).fromNow()}</p> 
+                            </div>
                             <p className={styles['messageText']}>{he.decode(msg.messageText)}</p>
                         </div>
                     ))

@@ -9,7 +9,7 @@ const ChatroomList = () => {
     const { chatrooms, setChatrooms, setCurrentChatroom, createChatroom } = useChatContext();
 
     const handleSelectChatroom = (chatroom) => {
-        setCurrentChatroom(chatroom._id);
+        setCurrentChatroom(chatroom);
     };
 
     return (
