@@ -37,6 +37,25 @@ const Sidebar = () => {
                                     <span className="user-name">{user.user.username}</span>
                                     {/* <span className={`status ${user.isOnline ? "online" : "offline"}`}></span> */}
                                 </div>
+                                <div className={styles['user-actions']}>
+                                    <ul>
+                                        <button>
+                                            View Profile
+                                        </button>
+                                        <button>
+                                            Direct message
+                                        </button>
+                                        <button>
+                                            Remove from chat
+                                        </button>
+                                        <button>
+                                            Promote to admin/Demote from admin
+                                        </button>
+                                        <button>
+                                            Add/Remove friend 
+                                        </button>
+                                    </ul>
+                                </div>
                             </li>
                         ))}
                     </ul>
