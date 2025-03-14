@@ -153,9 +153,49 @@ export const UserProvider = ({ children }) => {
         }
         console.log('Logged out.');
     };
+    const addFriend = async (friendId) => {
+        console.log(friendId);
+        try {
+            const response = await client.post('/api/friendship', {
+                friendId,
+            });
+            if (response.data?.error) {
+                throw response.data.error;
+            }
+            console.log('Friend added!');
+        } catch (error) {
+            throw error;
+        }
+    };
 
+    const removeParticipant = async (participantId) => {
+        console.log(participantId);
+        try {
+            const response = await client.delete(`/api/chatrooms/${currentChatroom._id}/participants/${participantId}`);
+            if (response.data?.error) {
+                throw response.data.error;
+            }
+            console.log('Participant removed!');
+        } catch (error) {
+            throw error;
+        }
+    }
+    const updateParticipantRole = async (participantId, role) => {
+        console.log(participantId, role);
+        try {
+            const response = await client.put(`/api/chatrooms/${currentChatroom._id}/participants/${participantId}`, {
+                role,
+            });
+            if (response.data?.error) {
+                throw response.data.error;
+            }
+            console.log('Participant role updated!');
+        } catch (error) {
+            throw error;
+        }
+    }
     return (
-        <UserContext.Provider value={{ user, loading, signup, login, logout }}>
+        <UserContext.Provider value={{ user, addFriend, removeParticipant, updateParticipantRole, loading, signup, login, logout }}>
             {children}
         </UserContext.Provider>
     );
